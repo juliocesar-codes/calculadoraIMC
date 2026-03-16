@@ -29,6 +29,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -103,12 +104,19 @@ fun CalculadoraScreem(modifier: Modifier = Modifier) {
             }
 
             var imc by remember {
-                mutableStateOf(0.00f)
+                mutableFloatStateOf(0.00f)
             }
 
             var classificacao by remember {
                 mutableStateOf("")
             }
+
+            val formatadoImc = String.format("%.2f", imc)
+
+            var background by remember {
+                mutableStateOf(Color.Black)
+            }
+
 //            Form
             Card(modifier = Modifier
                 .fillMaxWidth()
@@ -181,56 +189,81 @@ fun CalculadoraScreem(modifier: Modifier = Modifier) {
                             .align(Alignment.CenterHorizontally)
                     )
 
-                    Button(
-                        onClick = {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        Button(
+                            onClick = {
 
-                            var alturaFloat = altura.toFloat() / 100
-                            var pesoFloat = peso.toFloat()
+                                var alturaFloat = altura.toFloat() / 100
+                                var pesoFloat = peso.toFloat()
 
-                            if (altura != "" && peso != "" && alturaFloat > 0 && pesoFloat > 0){
+                                if (altura != "" && peso != "" && alturaFloat > 0 && pesoFloat > 0){
 
-                                imc = pesoFloat / (alturaFloat * alturaFloat)
+                                    imc = pesoFloat / (alturaFloat * alturaFloat)
 
                                     if (imc < 18.5){
                                         classificacao = "Abaixo do peso"
+                                        background = Color.Red
                                     }else if (imc > 18.5 && imc < 25.0){
                                         classificacao = "Peso ideal"
+                                        background = Color.Green
                                     }else if (imc >= 25 && imc < 30){
                                         classificacao = "Levemente acima do peso"
+                                        background = Color(255, 165, 0)
                                     }else if(imc >= 30 && imc < 35){
                                         classificacao = "Obesidade grau I"
+                                        background = Color.Red
                                     }else if(imc >= 35 && imc < 40){
                                         classificacao = "Obesidade grau II"
+                                        background = Color.Red
                                     }else{
                                         classificacao = "Obesidade grau III"
+                                        background = Color.Red
                                     }
 
-                            }else{
-                                classificacao = "Valores Inválidos"
+                                }else{
+                                    classificacao = "Valores Inválidos"
+                                    imc = 0.0F
+                                }
+                            },
+                        ) {
+                            Text("Calcular")
+                        }
+                        Button(
+                            onClick = {
+                                altura = ""
+                                peso = ""
                             }
-                        },
-                        modifier = Modifier
-                            .width(270.dp)
-                            .align(Alignment.CenterHorizontally)
-                    ) {
-                        Text("Calcular")
+
+                        ) {
+                            Text("Limpar")
+                        }
                     }
+
+
                 }
             }
+
+
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(40.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = background
+                    )
                 ) {
                     Row(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color(76, 166, 213)),
+                            .fillMaxSize(),
                         horizontalArrangement = Arrangement.SpaceAround,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = imc.toString(),
+                            text = formatadoImc,
                             modifier = Modifier,
                             fontSize = 20.sp,
                             color = Color.White
